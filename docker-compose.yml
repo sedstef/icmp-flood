@@ -1,0 +1,13 @@
+services:
+  attacker:
+    image: kalilinux/kali-rolling
+    container_name: attacker
+    tty: true
+  victim:
+    image: debian:trixie
+    container_name: victim
+    tty: true
+  observer:
+    image: debian:trixie
+    container_name: observer
+    tty: true
