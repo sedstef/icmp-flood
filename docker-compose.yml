@@ -1,8 +1,11 @@
 services:
   attacker:
-    image: kalilinux/kali-rolling
+    image: icmp-flood/attacker:latest
+    build:
+      context: services/attacker
     container_name: attacker
     tty: true
+    privileged: true
   victim:
     image: debian:trixie
     container_name: victim
