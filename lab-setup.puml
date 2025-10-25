@@ -1,0 +1,52 @@
+@startuml
+' Podman isolated lab for safe ICMP simulation (defensive/monitoring only)
+skinparam rectangle {
+  BackgroundColor<<Host>> #EFEFEF
+  BackgroundColor<<Pod>> #F7F7FF
+  BackgroundColor<<Container>> #FFFFFF
+  BorderColor black
+}
+
+title Podman Isolated Lab - Attacker / Victim / Observer (Lab-only)
+
+rectangle "Podman Host\n(air-gapped)" as HOST <<Host>> {
+  rectangle "Isolated Pod Network" as POD <<Pod>> {
+    rectangle "attacker\n(Kali)" as ATK <<Container>> {
+      note right of ATK
+        - Kali Linux container (lab-only)
+        - use for analysis, replay, or IDS testing only
+        - no upstream Internet access
+      end note
+    }
+
+    rectangle "victim\n(Debian Trixie)" as VICTIM <<Container>> {
+      note right of VICTIM
+        - Target service (HTTP / test app)
+        - hardened via sysctl & nftables
+        - resource limits (cgroups)
+      end note
+    }
+
+    rectangle "observer\n(Debian Trixie)" as OBS <<Container>> {
+      note right of OBS
+        - tcpdump / Wireshark / tshark
+        - PCAP storage and analysis
+      end note
+    }
+  }
+
+  rectangle "Storage / Reports" as STORE <<Container>> {
+    note right of STORE
+      - PCAPs, metrics, IDS logs
+    end note
+  }
+}
+
+' connections
+ATK -[#0000FF]-> VICTIM : "Lab network (isolated)"
+ATK -[#0000FF]-> OBS : "Traffic mirrored/observed"
+VICTIM -[#008000]-> OBS : "Observed by observer (pcap)"
+OBS -[#AA00AA]-> STORE : "PCAP files & reports"
+HOST -[#000000,dashed]-> "External Network (blocked)" : "No internet / air-gapped"
+
+@enduml
